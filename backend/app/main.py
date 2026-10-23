@@ -21,6 +21,7 @@ from .models import (
     VerifyRequest,
 )
 from .orchestrator import Orchestrator
+from .skills import load_skill
 
 START_MONOTONIC = time.monotonic()
 DATA_DIR = Path(__file__).parent / "data"
@@ -185,6 +186,14 @@ async def agents():
             "Migration Strategist is the only model-backed agent and always has a labelled fallback."
         ),
     }
+
+
+@app.get("/api/skill", tags=["system"])
+async def skill():
+    metadata = load_skill().public_metadata()
+    metadata["prompt_integration"] = "Migration Strategist includes the SKILL.md workflow in every Gemma prompt."
+    metadata["standards"] = "https://agentskills.io/specification"
+    return metadata
 
 
 @app.get("/api/samples", tags=["demo"])

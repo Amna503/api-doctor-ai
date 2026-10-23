@@ -12,6 +12,7 @@ from ..llm.fallback import build_fallback_plan
 from ..llm.gemma import GemmaAdapter
 from ..llm.prompts import PROMPT_VERSION, build_migration_prompt
 from ..models import Consumer, Finding, MigrationPlan, MigrationStep
+from ..skills import Skill, load_skill
 
 
 class MigrationStrategistInput(BaseModel):
@@ -115,8 +116,9 @@ class MigrationStrategist:
     timeout_seconds = 45.0
     max_retries = settings.gemma_max_retries
 
-    def __init__(self, adapter: ModelAdapter | None = None) -> None:
+    def __init__(self, adapter: ModelAdapter | None = None, skill: Skill | None = None) -> None:
         self.adapter = adapter or GemmaAdapter()
+        self.skill = skill or load_skill()
 
     async def run(self, payload: MigrationStrategistInput) -> MigrationStrategistOutput:
         started = perf_counter()
@@ -146,6 +148,7 @@ class MigrationStrategist:
             payload.old_meta,
             payload.new_meta,
             payload.new_endpoints[:80],
+            skill_guidance=self.skill.body,
         )
 
         result = None
@@ -168,7 +171,8 @@ class MigrationStrategist:
                 duration_ms = int((perf_counter() - started) * 1000)
                 detail = (
                     f"Gemma returned schema-valid guidance after {result.attempts} attempt(s). "
-                    f"Provider latency: {result.duration_ms} ms."
+                    f"Provider latency: {result.duration_ms} ms. "
+                    f"Applied skill {self.skill.name} v{self.skill.version}."
                 )
                 return MigrationStrategistOutput(
                     plan=plan,
