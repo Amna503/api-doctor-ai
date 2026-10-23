@@ -255,5 +255,5 @@ This is a hackathon project. See the repository for issues and guidelines.
 ## Links
 
 - **GitHub:** `https://github.com/Amna503/api-doctor-ai` (to be created/pushed)
-- **Live Frontend:** (to be deployed)
+- **Live Frontend:** https://api-doctor-ai-frontend.vercel.app/ 
 - **Live Backend Health:** (to be deployed)
