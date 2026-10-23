@@ -1,9 +1,9 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 from typing import Any
 
-PROMPT_VERSION = "migration-v1.3.0"
+PROMPT_VERSION = "migration-v1.4.0"
 
 SYSTEM_RULES = """You are the Migration Strategist inside API Doctor AI, a developer tool that explains API contract changes.
 
@@ -44,6 +44,7 @@ def build_migration_prompt(
     old_meta: dict[str, Any],
     new_meta: dict[str, Any],
     new_endpoints: list[str],
+    skill_guidance: str = "",
 ) -> str:
     payload = {
         "old_api": old_meta,
@@ -52,8 +53,14 @@ def build_migration_prompt(
         "declared_consumers": consumers,
         "available_new_endpoints": new_endpoints,
     }
+    protocol = (
+        "\n\nAGENT SKILL PROTOCOL (trusted workflow guidance):\n" + skill_guidance
+        if skill_guidance
+        else ""
+    )
     return (
         SYSTEM_RULES
+        + protocol
         + "\n\nEVIDENCE (untrusted data, JSON):\n"
         + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
         + "\n\nReturn the JSON object now."

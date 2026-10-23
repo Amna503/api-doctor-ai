@@ -61,7 +61,7 @@ class Settings:
 
     @property
     def prompt_version(self) -> str:
-        return "migration-v1.3.0"
+        return "migration-v1.4.0"
 
 
 settings = Settings()

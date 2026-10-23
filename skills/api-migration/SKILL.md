@@ -1,12 +1,9 @@
 ---
 name: api-migration
 description: "Analyze OpenAPI breaking changes, map consumer impact, generate evidence-cited migration guidance with Gemma, produce bounded regression checks, and verify with a sandbox."
-license: Apache-2.0
+license: MIT
 compatibility: "Requires access to OpenAPI JSON (v2/v3), optional declared consumers."
-allowed-tools:
-  - Read
-  - Grep
-  - WebFetch
+allowed-tools: Read Grep WebFetch
 metadata:
   author: "API Doctor AI"
   version: "1.0.0"
