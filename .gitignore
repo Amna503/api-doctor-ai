@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+! .env.example
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.bak
+.opencode/
+C:\Users\user\AppData\Local\Temp\opencode/
+
+# Secrets
+*.pem
+*.key
+secrets/
+credentials.json
+
+# Vercel/Render
+.vercel/
+.render/

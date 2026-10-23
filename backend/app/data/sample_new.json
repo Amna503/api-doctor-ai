@@ -1,0 +1,248 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Acme Payments API",
+    "version": "2.0.0",
+    "description": "Version 2 payments platform with cursor pagination, minor-unit amounts, and OAuth 2.0."
+  },
+  "servers": [{ "url": "https://api.acme.example/v2" }],
+  "security": [{ "bearerAuth": [], "oauth2": ["payments:read"] }],
+  "paths": {
+    "/v2/payments": {
+      "get": {
+        "operationId": "listPaymentsV2",
+        "summary": "List payments with cursor pagination",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment list",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PaymentV2" } }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "post": {
+        "operationId": "createPaymentV2",
+        "summary": "Create a payment using minor units",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "minLength": 8 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PaymentCreateV2" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created payment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentV2" }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/v2/payments/{paymentId}": {
+      "get": {
+        "operationId": "getPaymentV2",
+        "summary": "Get a payment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentV2" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/v2/payments/{paymentId}/capture": {
+      "post": {
+        "operationId": "capturePaymentV2",
+        "summary": "Capture an authorized payment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Captured payment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentV2" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/refunds": {
+      "post": {
+        "operationId": "createRefundV2",
+        "summary": "Create a refund using minor units",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["payment_id", "amount_cents"],
+                "properties": {
+                  "payment_id": { "type": "string" },
+                  "amount_cents": { "type": "integer", "minimum": 1 },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "payment_id", "amount_cents", "status"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "payment_id": { "type": "string" },
+                    "amount_cents": { "type": "integer" },
+                    "status": { "type": "string", "enum": ["pending", "succeeded"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/customers/{customerId}": {
+      "get": {
+        "operationId": "getCustomer",
+        "summary": "Get a customer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "email", "display_name", "created_at"],
+                  "properties": {
+                    "id": { "type": "string", "example": "cus_1042" },
+                    "email": { "type": "string", "format": "email" },
+                    "display_name": { "type": "string" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://auth.acme.example/oauth/token",
+            "scopes": {
+              "payments:read": "Read payments",
+              "payments:write": "Create payments and refunds"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "PaymentV2": {
+        "type": "object",
+        "required": ["id", "amount_cents", "currency", "status", "created_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "amount_cents": { "type": "integer", "minimum": 1 },
+          "currency": { "type": "string", "enum": ["usd", "eur", "gbp"] },
+          "status": { "type": "string", "enum": ["succeeded", "pending", "failed", "refunded"] },
+          "created_at": { "type": "string", "format": "date-time" },
+          "refundable": { "type": "boolean" }
+        }
+      },
+      "PaymentCreateV2": {
+        "type": "object",
+        "required": ["amount_cents", "currency", "customer_id"],
+        "properties": {
+          "amount_cents": { "type": "integer", "minimum": 1 },
+          "currency": { "type": "string", "enum": ["usd", "eur", "gbp"] },
+          "customer_id": { "type": "string" },
+          "description": { "type": "string" },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

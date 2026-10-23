@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Acme Payments API",
+    "version": "1.4.0",
+    "description": "Legacy payments platform used by mobile, partner, and billing consumers."
+  },
+  "servers": [{ "url": "https://api.acme.example/v1" }],
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/v1/payments": {
+      "get": {
+        "operationId": "listPayments",
+        "summary": "List payments",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["succeeded", "pending", "failed"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment list",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Payment" } }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "post": {
+        "operationId": "createPayment",
+        "summary": "Create a payment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PaymentCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created payment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Payment" }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/v1/payments/{paymentId}": {
+      "get": {
+        "operationId": "getPayment",
+        "summary": "Get a payment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Payment" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/v1/customers/{customerId}": {
+      "get": {
+        "operationId": "getCustomer",
+        "summary": "Get a customer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "email", "name", "created_at"],
+                  "properties": {
+                    "id": { "type": "string", "example": "cus_1042" },
+                    "email": { "type": "string", "format": "email" },
+                    "name": { "type": "string" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/v1/refunds": {
+      "post": {
+        "operationId": "createRefund",
+        "summary": "Create a refund",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["payment_id", "amount"],
+                "properties": {
+                  "payment_id": { "type": "string" },
+                  "amount": { "type": "number", "minimum": 0.01 },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "payment_id", "amount", "status"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "payment_id": { "type": "string" },
+                    "amount": { "type": "number" },
+                    "status": { "type": "string", "enum": ["pending", "succeeded"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/webhooks": {
+      "post": {
+        "operationId": "createWebhook",
+        "summary": "Register a webhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["url", "events"],
+                "properties": {
+                  "url": { "type": "string", "format": "uri" },
+                  "events": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Webhook created" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Payment": {
+        "type": "object",
+        "required": ["id", "amount", "currency", "status", "customer_id", "created_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "amount": { "type": "number", "minimum": 0.01 },
+          "currency": { "type": "string", "enum": ["usd", "eur"] },
+          "status": { "type": "string", "enum": ["succeeded", "pending", "failed"] },
+          "customer_id": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaymentCreate": {
+        "type": "object",
+        "required": ["amount", "currency", "customer_id"],
+        "properties": {
+          "amount": { "type": "number", "minimum": 0.01 },
+          "currency": { "type": "string", "enum": ["usd", "eur"] },
+          "customer_id": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,283 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-ink: #06080a;
+  --color-panel: #0b0f13;
+  --color-panel-2: #0f151b;
+  --color-panel-3: #131b22;
+  --color-line: #1c2730;
+  --color-line-bright: #2a3a45;
+  --color-acid: #c8f45a;
+  --color-acid-strong: #b5ef2f;
+  --color-cyan: #5ce1e6;
+  --color-muted: #8a99a5;
+  --color-faint: #5c6c78;
+  --color-critical: #ff5470;
+  --color-high: #ff8a45;
+  --color-medium: #f4c95d;
+  --color-low: #6ca8ff;
+  --color-info: #8b98a9;
+}
+
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --header-height: 68px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 24px);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background-color: #06080a;
+  color: #e9eef2;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  background-image:
+    radial-gradient(ellipse 70% 45% at 82% -10%, rgba(200, 244, 90, 0.09), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 8% 18%, rgba(92, 225, 230, 0.055), transparent 65%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(200, 244, 90, 0.85);
+  color: #06080a;
+}
+
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+textarea:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #c8f45a;
+  outline-offset: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #080c0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #26333d;
+  border-radius: 999px;
+  border: 2px solid #080c0f;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4c58;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(17, 24, 30, 0.92), rgba(9, 13, 17, 0.97));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.035) inset,
+    0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.panel-inset {
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 14px;
+  background: rgba(6, 9, 12, 0.65);
+}
+
+.hairline {
+  border-color: rgba(255, 255, 255, 0.075);
+}
+
+.corner-cut {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+
+.corner-cut-sm {
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
+}
+
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a99a5;
+}
+
+.diagnostic-grid {
+  background-image:
+    linear-gradient(rgba(200, 244, 90, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 244, 90, 0.055) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+.scanlines::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 0, 0, 0.16) 4px
+  );
+  opacity: 0.32;
+}
+
+.ecg-line {
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+  animation: ecg-draw 4.5s linear infinite;
+}
+
+@keyframes ecg-draw {
+  0% {
+    stroke-dashoffset: 700;
+  }
+  45% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -700;
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 244, 90, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(200, 244, 90, 0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fade-up-delay-1 {
+  animation-delay: 0.06s;
+}
+.fade-up-delay-2 {
+  animation-delay: 0.12s;
+}
+.fade-up-delay-3 {
+  animation-delay: 0.18s;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #10171d 25%, #17222a 50%, #10171d 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.agent-scan {
+  position: relative;
+  overflow: hidden;
+}
+.agent-scan::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(200, 244, 90, 0.09), transparent);
+  animation: agent-scan 1.8s ease-in-out infinite;
+}
+@keyframes agent-scan {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.trace-line {
+  border-left: 1px dashed rgba(255, 255, 255, 0.14);
+}
+
+.code-scroll {
+  scrollbar-width: thin;
+}
+
+.graph-canvas canvas {
+  border-radius: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .ecg-line {
+    stroke-dashoffset: 0;
+  }
+}

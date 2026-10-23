@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Mobile App (iOS)",
+    "owner": "Mobile Platform",
+    "endpoints": [
+      "GET /v1/payments",
+      "POST /v1/payments",
+      "GET /v1/payments/{paymentId}"
+    ]
+  },
+  {
+    "name": "Partner Portal",
+    "owner": "Partner Experience",
+    "endpoints": [
+      "GET /v1/customers/{customerId}",
+      "POST /v1/refunds"
+    ]
+  },
+  {
+    "name": "Billing Worker",
+    "owner": "FinOps",
+    "endpoints": [
+      "GET /v1/payments",
+      "POST /v1/webhooks",
+      "GET /v1/customers/{customerId}"
+    ]
+  }
+]
